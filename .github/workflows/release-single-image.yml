@@ -5,6 +5,9 @@ on:
       pipeline-argument:
         description: 'Argument to pass to pipeline'
         required: true
+      image-tag:
+        description: 'Image tag to build'
+        required: true
 jobs:
   release-single-image:
     runs-on: ubuntu-latest
@@ -36,10 +39,23 @@ jobs:
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v2
 
-      - name: Publish Image To DaoCloud
-        run: python pipeline.py --image-name ${{ github.event.inputs.pipeline-argument }} --tag 0.10.0
+      - name: Publish Image To ghcr.io
+        run: python pipeline.py --image-name ${{ github.event.inputs.pipeline-argument }}
         env:
           MONGODB_COMMUNITY_CONFIG: "${{ github.workspace }}/scripts/ci/config.json"
-         
           GRS_USERNAME: "${{ vars.GRS_USERNAME }}"
           GRS_PASSWORD: "${{ secrets.GRS_PASSWORD }}"
+
+      - name: Tag Docker image with input image tag
+        run: |
+          docker tag ghcr.io/usernameisnull/${{ github.event.inputs.pipeline-argument }}:latest-arm64 ghcr.io/usernameisnull/${{ github.event.inputs.pipeline-argument }}:${{ github.event.inputs.image-tag }}-arm64
+          docker push ghcr.io/usernameisnull/${{ github.event.inputs.pipeline-argument }}:${{ github.event.inputs.image-tag }}-arm64
+          docker tag ghcr.io/usernameisnull/${{ github.event.inputs.pipeline-argument }}:latest-amd64 ghcr.io/usernameisnull/${{ github.event.inputs.pipeline-argument }}:${{ github.event.inputs.image-tag }}-amd64
+          docker push ghcr.io/usernameisnull/${{ github.event.inputs.pipeline-argument }}:${{ github.event.inputs.image-tag }}-amd64
+
+      - name: Create and push manifest images
+        uses: Noelware/docker-manifest-action@master
+        with:
+          inputs: ghcr.io/usernameisnull/${{ github.event.inputs.pipeline-argument }}:${{ github.event.inputs.image-tag }}
+          images: ghcr.io/usernameisnull/${{ github.event.inputs.pipeline-argument }}:${{ github.event.inputs.image-tag }}-amd64,ghcr.io/usernameisnull/${{ github.event.inputs.pipeline-argument }}:${{ github.event.inputs.image-tag }}-arm64
+          push: true
