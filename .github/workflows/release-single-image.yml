@@ -25,12 +25,12 @@ jobs:
       - name: Install Python Dependencies
         run: pip install -r requirements.txt
 
-      - name: Login to Quay.io
+      - name: Login to GitHub Container Registry
         uses: docker/login-action@v2
         with:
-          registry: release.daocloud.io
-          username: ${{ secrets.QUAY_USERNAME }}
-          password: ${{ secrets.QUAY_ROBOT_TOKEN }}
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
 
       # template: .action_templates/steps/set-up-qemu.yaml
       - name: Set up QEMU
