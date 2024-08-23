@@ -12,5 +12,5 @@
   "agent_image_dev": "mongodb-agent-ubi-dev",
   "readiness_probe_image": "mongodb-kubernetes-readinessprobe",
   "readiness_probe_image_dev": "mongodb-kubernetes-readinessprobe-dev",
-  "s3_bucket": "s3://enterprise-operator-dockerfiles/dockerfiles"
+  "s3_bucket": ""
 }
