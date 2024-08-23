@@ -271,7 +271,10 @@ def main() -> int:
         config.ensure_skip_tag("release")
         if args.sign:
             logger.warning("--sign flag has no effect without --release")
-
+            
+    if args.tag != "":
+        config.ensure_tag_is_run(args.tag)
+        
     if args.arch:
         arch_set = set(args.arch)
     else:
