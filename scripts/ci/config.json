@@ -5,6 +5,5 @@
   "version_upgrade_hook_image": "mongodb-kubernetes-operator-version-upgrade-post-start-hook",
   "agent_image": "mongodb-agent-ubi",
   "readiness_probe_image": "mongodb-kubernetes-readinessprobe",
-  "skip_tags": "latest",
   "s3_bucket": ""
 }
