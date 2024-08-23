@@ -37,7 +37,7 @@ jobs:
         uses: docker/setup-qemu-action@v2
 
       - name: Publish Image To DaoCloud
-        run: python pipeline.py --image-name ${{ github.event.inputs.pipeline-argument }} --tag 0.10.0
+        run: python pipeline.py --image-name ${{ github.event.inputs.pipeline-argument }}
         env:
           MONGODB_COMMUNITY_CONFIG: "${{ github.workspace }}/scripts/ci/config.json"
          
