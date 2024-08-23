@@ -40,7 +40,7 @@ jobs:
         uses: docker/setup-qemu-action@v2
 
       - name: Publish Image To ghcr.io
-        run: python pipeline.py --image-name ${{ github.event.inputs.pipeline-argument }}
+        run: python pipeline.py --image-name ${{ github.event.inputs.pipeline-argument }} --tag ${{ github.event.inputs.image-tag }}
         env:
           MONGODB_COMMUNITY_CONFIG: "${{ github.workspace }}/scripts/ci/config.json"
           GRS_USERNAME: "${{ vars.GRS_USERNAME }}"
