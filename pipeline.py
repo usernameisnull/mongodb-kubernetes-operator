@@ -87,8 +87,10 @@ def build_and_push_image(
     architectures: Set[str],
     release: bool,
     sign: bool,
-    insecure: bool = False,
 ) -> None:
+    
+    logger.info(f"args = {args}, image_name = {image_name}, config = {config}")
+    
     if sign:
         mongodb_artifactory_login()
     for arch in architectures:
@@ -120,18 +122,16 @@ def build_and_push_image(
     else:
         raise Exception("Dev image must be specified")
 
+    push_manifest(config, architectures, image_to_push)
+
     if config.gh_run_id:
-        push_manifest(config, architectures, image_to_push, insecure, config.gh_run_id)
-    else:
-        push_manifest(config, architectures, image_to_push, insecure)
+        push_manifest(config, architectures, image_to_push, config.gh_run_id)
 
     if release:
         registry = args["registry"] + "/" + args["image"]
         context_tag = args["release_version"] + "-context"
-        push_manifest(
-            config, architectures, args["image"], insecure, args["release_version"]
-        )
-        push_manifest(config, architectures, args["image"], insecure, context_tag)
+        push_manifest(config, architectures, args["image"], args["release_version"])
+        push_manifest(config, architectures, args["image"], context_tag)
         if sign:
             sign_and_verify(registry, args["release_version"])
             sign_and_verify(registry, context_tag)
@@ -152,7 +152,6 @@ def push_manifest(
     config: DevConfig,
     architectures: Set[str],
     image_name: str,
-    insecure: bool = False,
     image_tag: str = "latest",
 ) -> None:
     logger.info(f"Pushing manifest for {image_tag}")
@@ -167,9 +166,6 @@ def push_manifest(
         "create",
         final_manifest,
     ]
-
-    if insecure:
-        create_args.append("--insecure")
 
     for arch in architectures:
         create_args.extend(["--amend", final_manifest + "-" + arch])
@@ -227,7 +223,6 @@ def _parse_args() -> argparse.Namespace:
     )
     parser.add_argument("--tag", type=str)
     parser.add_argument("--sign", action="store_true", default=False)
-    parser.add_argument("--insecure", action="store_true", default=False)
     return parser.parse_args()
 
 
@@ -271,7 +266,7 @@ def main() -> int:
         config.ensure_skip_tag("release")
         if args.sign:
             logger.warning("--sign flag has no effect without --release")
-            
+
     if args.arch:
         arch_set = set(args.arch)
     else:
@@ -283,11 +278,11 @@ def main() -> int:
         logger.warning("--sign flag not provided, images won't be signed")
 
     image_args = build_image_args(config, image_name)
-    
-    print("image_args = ", image_args)
-    
+
+    logger.info("image_args = {image_args}")
+
     build_and_push_image(
-        image_name, config, image_args, arch_set, args.release, args.sign, args.insecure
+        image_name, config, image_args, arch_set, args.release, args.sign
     )
     return 0
 
