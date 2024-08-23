@@ -54,7 +54,7 @@ def build_image_args(config: DevConfig, image_name: str) -> Dict[str, str]:
         "registry": config.repo_url,
         "s3_bucket": config.s3_bucket,
         "builder_image": release["golang-builder-image"],
-        "base_image": "registry.access.redhat.com/ubi8/ubi-minimal:latest",
+        "base_image": "registry.access.redhat.com/ubi8/ubi-minimal:8.6-994",
         "inventory": "inventory.yaml",
         "skip_tags": config.skip_tags,  # Include skip_tags
         "include_tags": config.include_tags,  # Include include_tags
