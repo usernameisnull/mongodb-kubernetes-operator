@@ -271,12 +271,7 @@ def main() -> int:
         config.ensure_skip_tag("release")
         if args.sign:
             logger.warning("--sign flag has no effect without --release")
-    
-    config.ensure_skip_tag("latest")
-    
-    if args.tag != "":
-        config.ensure_tag_is_run(args.tag)
-        
+            
     if args.arch:
         arch_set = set(args.arch)
     else:
@@ -288,7 +283,9 @@ def main() -> int:
         logger.warning("--sign flag not provided, images won't be signed")
 
     image_args = build_image_args(config, image_name)
+    
     print("image_args = ", image_args)
+    
     build_and_push_image(
         image_name, config, image_args, arch_set, args.release, args.sign, args.insecure
     )
