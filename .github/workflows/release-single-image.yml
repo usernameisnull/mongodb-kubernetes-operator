@@ -5,9 +5,6 @@ on:
       pipeline-argument:
         description: 'Argument to pass to pipeline'
         required: true
-      release-key:
-        description: 'Corresponding release.json key'
-        required: true
 jobs:
   release-single-image:
     runs-on: ubuntu-latest
@@ -27,16 +24,11 @@ jobs:
 
       - name: Install Python Dependencies
         run: pip install -r requirements.txt
-      - name: Determine if release is needed
-        id: release_status
-        run: |
-          OUTPUT=$(scripts/ci/determine_required_releases.py ${{ github.event.inputs.release-key }})
-          echo "::set-output name=OUTPUT::$OUTPUT"
 
       - name: Login to Quay.io
         uses: docker/login-action@v1
         with:
-          registry: quay.io
+          registry: release.daocloud.io
           username: ${{ secrets.QUAY_USERNAME }}
           password: ${{ secrets.QUAY_ROBOT_TOKEN }}
 
@@ -44,15 +36,10 @@ jobs:
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v2
 
-      - name: Publish Image To Quay
-        if: steps.release_status.outputs.OUTPUT == 'unreleased'
-        run: python pipeline.py --image-name ${{ github.event.inputs.pipeline-argument }} --release --sign
+      - name: Publish Image To DaoCloud
+        run: python pipeline.py --image-name ${{ github.event.inputs.pipeline-argument }} --release --tag 0.10.0
         env:
           MONGODB_COMMUNITY_CONFIG: "${{ github.workspace }}/scripts/ci/config.json"
-          AWS_ACCESS_KEY_ID: "${{ secrets.AWS_ACCESS_KEY_ID }}"
-          AWS_SECRET_ACCESS_KEY: "${{ secrets.AWS_SECRET_ACCESS_KEY }}"
+         
           GRS_USERNAME: "${{ vars.GRS_USERNAME }}"
           GRS_PASSWORD: "${{ secrets.GRS_PASSWORD }}"
-          PKCS11_URI: "${{ vars.PKCS11_URI }}"
-          ARTIFACTORY_USERNAME: "${{ vars.ARTIFACTORY_USERNAME }}"
-          ARTIFACTORY_PASSWORD: "${{ secrets.ARTIFACTORY_PASSWORD }}"
