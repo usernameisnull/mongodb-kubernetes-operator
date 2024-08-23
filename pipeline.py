@@ -120,10 +120,10 @@ def build_and_push_image(
     else:
         raise Exception("Dev image must be specified")
 
-    push_manifest(config, architectures, image_to_push, insecure)
-
     if config.gh_run_id:
         push_manifest(config, architectures, image_to_push, insecure, config.gh_run_id)
+    else:
+        push_manifest(config, architectures, image_to_push, insecure)
 
     if release:
         registry = args["registry"] + "/" + args["image"]
@@ -271,7 +271,9 @@ def main() -> int:
         config.ensure_skip_tag("release")
         if args.sign:
             logger.warning("--sign flag has no effect without --release")
-            
+    
+    config.ensure_skip_tag("latest")
+    
     if args.tag != "":
         config.ensure_tag_is_run(args.tag)
         
@@ -286,7 +288,7 @@ def main() -> int:
         logger.warning("--sign flag not provided, images won't be signed")
 
     image_args = build_image_args(config, image_name)
-
+    print("image_args = ", image_args)
     build_and_push_image(
         image_name, config, image_args, arch_set, args.release, args.sign, args.insecure
     )
