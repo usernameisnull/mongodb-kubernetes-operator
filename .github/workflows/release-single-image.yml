@@ -45,17 +45,5 @@ jobs:
           MONGODB_COMMUNITY_CONFIG: "${{ github.workspace }}/scripts/ci/config.json"
           GRS_USERNAME: "${{ vars.GRS_USERNAME }}"
           GRS_PASSWORD: "${{ secrets.GRS_PASSWORD }}"
+          version_id: "${{ github.event.inputs.image-tag }}"
 
-      - name: Tag Docker image with input image tag
-        run: |
-          docker tag ghcr.io/usernameisnull/${{ github.event.inputs.pipeline-argument }}:latest-arm64 ghcr.io/usernameisnull/${{ github.event.inputs.pipeline-argument }}:${{ github.event.inputs.image-tag }}-arm64
-          docker push ghcr.io/usernameisnull/${{ github.event.inputs.pipeline-argument }}:${{ github.event.inputs.image-tag }}-arm64
-          docker tag ghcr.io/usernameisnull/${{ github.event.inputs.pipeline-argument }}:latest-amd64 ghcr.io/usernameisnull/${{ github.event.inputs.pipeline-argument }}:${{ github.event.inputs.image-tag }}-amd64
-          docker push ghcr.io/usernameisnull/${{ github.event.inputs.pipeline-argument }}:${{ github.event.inputs.image-tag }}-amd64
-
-      - name: Create and push manifest images
-        uses: Noelware/docker-manifest-action@master
-        with:
-          inputs: ghcr.io/usernameisnull/${{ github.event.inputs.pipeline-argument }}:${{ github.event.inputs.image-tag }}
-          images: ghcr.io/usernameisnull/${{ github.event.inputs.pipeline-argument }}:${{ github.event.inputs.image-tag }}-amd64,ghcr.io/usernameisnull/${{ github.event.inputs.pipeline-argument }}:${{ github.event.inputs.image-tag }}-arm64
-          push: true
