@@ -1,9 +1,10 @@
 {
   "namespace": "default",
-  "repo_url": "release.daocloud.io/demo",
+  "repo_url": "ghcr.io/usernameisnull",
   "operator_image": "mongodb-kubernetes-operator",
   "version_upgrade_hook_image": "mongodb-kubernetes-operator-version-upgrade-post-start-hook",
   "agent_image": "mongodb-agent-ubi",
   "readiness_probe_image": "mongodb-kubernetes-readinessprobe",
+  "include_tag": "0.10.0",
   "s3_bucket": ""
 }
